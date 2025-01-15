@@ -7,7 +7,7 @@ namespace vendor\Traits;
  */
 trait TSingleTone
 {
-    private static ?self $instance;
+    private static ?self $instance = null;
 
     public static function getInstance(): static
     {

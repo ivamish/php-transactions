@@ -11,14 +11,34 @@ class Router implements RouterInterface,SingletonInterface
 {
     use TSingleTone;
 
+    private array $routes = [];
 
-    public function setUrl(string $url, array $controller): bool
+    public function setUrl(string $url, array $controller, string $method = 'get'): bool
     {
-        // TODO: Implement setUrl() method.
+        if(array_key_exists($url, $this->routes)){
+            return false;
+        }
+
+        $this->routes[$url] = [
+            'method' => $method,
+            'controller' => $controller
+        ];
+
+        return true;
     }
 
     public function callActionUrl(string $url): ResponseInterface
     {
-        // TODO: Implement callActionUrl() method.
+
+    }
+
+    public static function get(string $url, array $controller) : bool
+    {
+        return self::getInstance()->setUrl($url, $controller);
+    }
+
+    public static function post(string $url, array $controller) : bool
+    {
+        return self::getInstance()->setUrl($url, $controller, 'post');
     }
 }
