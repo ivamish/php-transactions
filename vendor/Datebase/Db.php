@@ -15,8 +15,11 @@ class Db implements SingletonInterface
 
     private function __construct()
     {
+
+        $db_connect_params = require_once '../../config/db_connect.php';
+
         try {
-            $this->pdo = new \PDO('sqlite:file:database.sqlite');
+            $this->pdo = new \PDO($db_connect_params['dsn']);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
             die('Ошибка при подключении к бд: ' . $e->getMessage());

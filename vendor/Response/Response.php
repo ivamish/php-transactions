@@ -8,14 +8,14 @@ use vendor\Interfaces\ResponseInterface;
 class Response implements ResponseInterface
 {
 
-    private array $data;
-    public function __construct(array $data)
+    private array|string $data;
+    public function __construct(array|string $data)
     {
         $this->data = $data;
     }
 
-    public function getBody(ResponseData $dataType): string|array
+    public function getBody(): string
     {
-        return $dataType == ResponseData::Array ? $this->data : json_encode($this->data);
+        return  is_array($this->data) ? json_encode($this->data) : $this->data;
     }
 }

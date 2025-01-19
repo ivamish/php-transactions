@@ -24,9 +24,22 @@ abstract class Model
      */
     final public function all(): array
     {
-        $sql = "SELECT * FROM {$this->table}";
-        $stmt = $this->db->getPdo()->query($sql);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $sql = "SELECT {$this->table}.* FROM {$this->table}";
+
+            foreach ($this->relations() as $relation) {
+                $type = $relation['type'] ?? 'INNER';
+                $table = $relation['table'];
+                $foreignKey = $relation['foreignKey'];
+                $localKey = $relation['localKey'] ?? 'id';
+                $sql .= " {$type} JOIN {$table} ON {$this->table}.{$localKey} = {$table}.{$foreignKey}";
+            }
+
+            $stmt = $this->db->getPdo()->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new \RuntimeException("Ошибка при выполнении запроса: " . $e->getMessage());
+        }
     }
 
     /**
@@ -37,9 +50,44 @@ abstract class Model
      */
     final public function getBy($value, string $column): array
     {
-        $sql = "SELECT * FROM {$this->table} WHERE {$column} = :value";
-        $stmt = $this->db->getPdo()->prepare($sql);
-        $stmt->execute(['value' => $value]);
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $sql = "SELECT {$this->table}.* FROM {$this->table}";
+
+
+            foreach ($this->relations() as $relation) {
+                $type = $relation['type'] ?? 'INNER';
+                $table = $relation['table'];
+                $foreignKey = $relation['foreignKey'];
+                $localKey = $relation['localKey'] ?? 'id';
+                $sql .= " {$type} JOIN {$table} ON {$this->table}.{$localKey} = {$table}.{$foreignKey}";
+            }
+
+
+            $sql .= " WHERE {$this->table}.{$column} = :value";
+
+            $stmt = $this->db->getPdo()->prepare($sql);
+            $stmt->execute(['value' => $value]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new \RuntimeException("Ошибка при выполнении запроса: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Возвращает описание связей модели,
+     * необходимо переопределить в дочерних классах, если надо
+     *
+     * [
+     *      'table' => 'posts', // Имя связанной таблицы
+     *      'foreignKey' => 'user_id', // Ключ в связанной таблице
+     *      'localKey' => 'id', // Ключ в текущей таблице (опционально)
+     *      'type' => 'INNER', // Тип JOIN (опционально)
+     * ]
+     *
+     * @return array
+     */
+    protected function relations(): array
+    {
+        return [];
     }
 }

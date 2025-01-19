@@ -6,6 +6,6 @@ use vendor\Enums\ResponseData;
 
 interface ResponseInterface
 {
-    public function __construct(array $data);
-    public function getBody(ResponseData $dataType) : string|array;
+    public function __construct(array|string $data);
+    public function getBody() : string;
 }

@@ -1,6 +1,8 @@
 <?php
 
 require_once 'vendor/autoload.php';
+require_once 'vendor/helpers.php';
+require_once 'app/Infastructure/Routes/web.php';
 
 use vendor\Router\Router;
 
@@ -8,13 +10,9 @@ if (file_exists(__DIR__ . $_SERVER['REQUEST_URI'])) {
     return false;
 }
 
-Router::getInstance()->setUrl('hahaha', ['hahaha', 'hhahahaha']);
-
-\vendor\Datebase\Db::getInstance();
+echo '12';
 
 $requestUri = $_SERVER['REQUEST_URI'];
-$testValue = ltrim($requestUri, '/');
+$response = Router::getInstance()->callActionUrl($requestUri);
 
-echo '123';
-
-//require_once __DIR__ . '/index.php';
+echo $response->getBody();
